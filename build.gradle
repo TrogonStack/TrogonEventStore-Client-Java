@@ -10,8 +10,6 @@ plugins {
     id 'com.google.protobuf' version '0.9.4'
     id 'idea'
     id 'maven-publish'
-    id 'signing'
-    id 'org.jreleaser' version '1.17.0'
 }
 
 def ENV = System.getenv()
@@ -24,8 +22,8 @@ tasks.withType(JavaCompile) {
     options.compilerArgs += ['-Xlint:deprecation', '-Xlint:unchecked']
 }
 
-group = 'io.kurrent'
-version = '1.2.1'
+group = 'io.trogonstack'
+version = '0.0.1' // x-release-please-version
 
 java {
     withSourcesJar()
@@ -101,7 +99,7 @@ tasks.withType(Test).configureEach {
 }
 
 tasks.register("generateCertificates", Exec) {
-    description = "Generates SSL certificates to start a secured ESDB server"
+    description = "Generates SSL certificates to start a secured TrogonEventStore server"
     commandLine 'docker', 'compose', '--file', './configure-tls-for-tests.yml', 'up'
 }
 
@@ -111,12 +109,12 @@ tasks.register("generateUserCertificates", Exec) {
 }
 
 tasks.register("startDockerCompose", Exec) {
-    description = "Starts ESDB cluster"
+    description = "Starts the TrogonEventStore cluster"
     commandLine 'docker', 'compose', '--file', './docker-compose.yml', 'up', '-d'
 }
 
 tasks.register("stopDockerCompose", Exec) {
-    description = "Stop ESDB cluster"
+    description = "Stops the TrogonEventStore cluster"
     commandLine 'docker', 'compose', '--file', './docker-compose.yml', 'down'
 }
 
@@ -207,47 +205,33 @@ javadoc {
     failOnError = false
 }
 
-tasks.register('checkVersion') {
-    doFirst {
-        def xml = new URL(
-                'https://repo.maven.apache.org/maven2/dev/aoqia/leaf/installer/maven-metadata.xml').text
-        def metadata = new groovy.xml.XmlSlurper().parseText(xml)
-        def versions = metadata.versioning.versions.version*.text();
-        if (versions.contains(version)) {
-            throw new RuntimeException("${version} has already been released!")
-        }
-    }
-}
-publish.mustRunAfter checkVersion
-
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId = 'io.kurrent'
-            artifactId = 'kurrentdb-client'
+            groupId = 'io.trogonstack'
+            artifactId = 'trogon-eventstore-client'
 
             from components.java
             pom {
-                name = 'KurrentDB gRPC Java client'
-                description = 'KurrentDB gRPC Java client'
-                url = 'https://kurrent.io'
+                name = 'TrogonEventStore Java Client'
+                description = 'Java client for TrogonEventStore'
+                url = 'https://github.com/TrogonStack/TrogonEventStore-Client-Java'
 
                 scm {
-                    connection = 'scm:git:https://github.com/kurrent-io/KurrentDB-Client-Java.git'
-                    developerConnection = 'scm:git:ssh:https://github.com/kurrent-io/KurrentDB-Client-Java.git'
-                    url = 'https://github.com/kurrent-io/KurrentDB-Client-Java'
+                    connection = 'scm:git:https://github.com/TrogonStack/TrogonEventStore-Client-Java.git'
+                    developerConnection = 'scm:git:ssh://git@github.com/TrogonStack/TrogonEventStore-Client-Java.git'
+                    url = 'https://github.com/TrogonStack/TrogonEventStore-Client-Java'
                 }
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
                 developers {
                     developer {
-                        id = 'ylaupa'
-                        name = 'Yorick Laupa'
-                        email = 'yorick.laupa@eventstore.com'
+                        id = 'straw-hat-team'
+                        name = 'Straw Hat, LLC'
                     }
                 }
             }
@@ -255,65 +239,11 @@ publishing {
     }
     repositories {
         maven {
-            name = "StagingDeploy"
-            url = layout.buildDirectory.dir('staging-deploy')
-        }
-    }
-}
-
-jreleaser {
-    project {
-        copyright = 'Kurrent, Inc'
-        description = 'Kurrent gRPC Java client'
-    }
-    signing {
-        active = 'ALWAYS'
-        armored = true
-        passphrase = ENV.JRELEASER_GPG_PASSPHRASE
-        publicKey = ENV.JRELEASER_GPG_PUBLIC_KEY
-        secretKey = ENV.JRELEASER_GPG_SECRET_KEY
-    }
-    deploy {
-        maven {
-            mavenCentral {
-                sonatype {
-                    active = 'ALWAYS'
-                    url = 'https://central.sonatype.com/api/v1/publisher'
-                    authorization = 'BEARER'
-                    username = ENV.JRELEASER_MAVENCENTRAL_USERNAME
-                    password = ENV.JRELEASER_MAVENCENTRAL_PASSWORD
-                    retryDelay = 60
-                    maxRetries = 60
-                    stagingRepository('build/staging-deploy')
-                }
-            }
-        }
-    }
-    release {
-        generic {
-            enabled = true
-            repoOwner = 'kurrent-io'
-            name = 'kurrentdb-client'
-            host = 'https://www.kurrent.io'
-            username = 'w1am'
-            sign = false
-            token = ENV.JRELEASER_GENERIC_TOKEN
-            skipRelease = true
-            skipTag = true
-        }
-        github {
-            enabled = false
-            repoOwner = 'kurrent-io'
-            name = 'KurrentDB-Client-Java'
-            host = 'github.com'
-            token = ENV.JRELEASER_GENERIC_TOKEN
-            sign = true
-            overwrite = true
-            artifacts = true
-            changelog {
-                enabled = false
-                formatted = 'ALWAYS'
-                preset = 'conventional-commits'
+            name = 'GitHubPackages'
+            url = uri('https://maven.pkg.github.com/TrogonStack/TrogonEventStore-Client-Java')
+            credentials {
+                username = ENV.GITHUB_ACTOR
+                password = ENV.GITHUB_TOKEN
             }
         }
     }
@@ -324,5 +254,5 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 if (!JavaVersion.current().isJava8Compatible()) {
-    throw new Exception("Java 8 is required to build Kurrent-Client-Java")
+    throw new Exception("Java 8 or newer is required to build TrogonEventStore-Client-Java")
 }

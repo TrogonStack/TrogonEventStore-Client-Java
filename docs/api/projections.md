@@ -4,22 +4,22 @@ title: Projections
 head:
   - - title
     - {}
-    - Projections | Java | Clients | Kurrent Docs
+    - Projections | Java | Clients | TrogonEventStore docs
 ---
 
 # Projection management
 
-The client provides a way to manage projections in KurrentDB. 
+The client provides a way to manage projections in TrogonEventStore.
 
 For a detailed explanation of projections, see the [server documentation](@server/features/projections/README.md).
 
 ## Creating a client
 
-The Java client provides a `KurrentDBProjectionManagementClient` that you can use to manage persistent subscriptions.
+The Java client provides a `TrogonEventStoreProjectionManagementClient` that you can use to manage persistent subscriptions.
 
 ```java
-KurrentDBClientSettings settings = KurrentDBConnectionString.parseOrThrow("kurrentdb://localhost:2113?tls=false");
-KurrentDBProjectionManagementClient client = KurrentDBProjectionManagementClient.create(settings);
+TrogonEventStoreClientSettings settings = TrogonEventStoreConnectionString.parseOrThrow("trogon-eventstore://localhost:2113?tls=false");
+TrogonEventStoreProjectionManagementClient client = TrogonEventStoreProjectionManagementClient.create(settings);
 ```
 
 ## Create a projection

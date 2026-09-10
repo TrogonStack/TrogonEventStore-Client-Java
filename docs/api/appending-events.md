@@ -4,7 +4,7 @@ order: 2
 
 # Appending events
 
-When you start working with KurrentDB, your application streams are empty. The first meaningful operation is to add one or more events to the database using this API.
+When you start working with TrogonEventStore, your application streams are empty. The first meaningful operation is to add one or more events to the database using this API.
 
 ::: tip
 Check the [Getting Started](getting-started.md) guide to learn how to configure and use the client SDK.
@@ -12,12 +12,12 @@ Check the [Getting Started](getting-started.md) guide to learn how to configure 
 
 ## Append your first event
 
-The simplest way to append an event to KurrentDB is to create an `EventData` object and call `appendToStream` method.
+The simplest way to append an event to TrogonEventStore is to create an `EventData` object and call `appendToStream` method.
 
 ```java {38-49}
-import io.kurrent.dbclient.AppendToStreamOptions;
-import io.kurrent.dbclient.EventData;
-import io.kurrent.dbclient.StreamState;
+import io.trogonstack.eventstore.client.AppendToStreamOptions;
+import io.trogonstack.eventstore.client.EventData;
+import io.trogonstack.eventstore.client.StreamState;
 
 import java.util.UUID;
 
@@ -68,8 +68,8 @@ client.appendToStream("orders", options, eventData)
 ```
 
 `appendToStream` takes a collection or a single object that can be serialized in JSON or binary format, which allows you to save more than one event in a single batch.
- 
-Outside the example above, other options exist for dealing with different scenarios. 
+
+Outside the example above, other options exist for dealing with different scenarios.
 
 ::: tip
 If you are new to Event Sourcing, please study the [Handling concurrency](#handling-concurrency) section below.
@@ -77,11 +77,11 @@ If you are new to Event Sourcing, please study the [Handling concurrency](#handl
 
 ## Working with EventData
 
-Events appended to KurrentDB must be wrapped in an `EventData` object. This allows you to specify the event's content, the type of event, and whether it's in JSON format. In its simplest form, you need three arguments: **eventId**, **eventType**, and **eventData**.
+Events appended to TrogonEventStore must be wrapped in an `EventData` object. This allows you to specify the event's content, the type of event, and whether it's in JSON format. In its simplest form, you need three arguments: **eventId**, **eventType**, and **eventData**.
 
 ### eventId
 
-This takes the format of a `UUID` and is used to uniquely identify the event you are trying to append. If two events with the same `UUID` are appended to the same stream in quick succession, KurrentDB will only append one of the events to the stream. 
+This takes the format of a `UUID` and is used to uniquely identify the event you are trying to append. If two events with the same `UUID` are appended to the same stream in quick succession, TrogonEventStore will only append one of the events to the stream.
 
 For example, the following code will only append a single event:
 
@@ -106,17 +106,17 @@ client.appendToStream("orders", options, eventData)
 
 ### eventType
 
-Each event should be supplied with an event type. This unique string is used to identify the type of event you are saving. 
+Each event should be supplied with an event type. This unique string is used to identify the type of event you are saving.
 
 It is common to see the explicit event code type name used as the type as it makes serialising and de-serialising of the event easy. However, we recommend against this as it couples the storage to the type and will make it more difficult if you need to version the event at a later date.
 
 ### eventData
 
-Representation of your event data. It is recommended that you store your events as JSON objects. This allows you to take advantage of all of KurrentDB's functionality, such as projections. That said, you can save events using whatever format suits your workflow. Eventually, the data will be stored as encoded bytes.
+Representation of your event data. It is recommended that you store your events as JSON objects. This allows you to take advantage of all of TrogonEventStore's functionality, such as projections. That said, you can save events using whatever format suits your workflow. Eventually, the data will be stored as encoded bytes.
 
 ### userMetadata
 
-Storing additional information alongside your event that is part of the event itself is standard practice. This can be correlation IDs, timestamps, access information, etc. KurrentDB allows you to store a separate byte array containing this information to keep it separate.
+Storing additional information alongside your event that is part of the event itself is standard practice. This can be correlation IDs, timestamps, access information, etc. TrogonEventStore allows you to store a separate byte array containing this information to keep it separate.
 
 ### contentType
 
@@ -124,7 +124,7 @@ The content type indicates whether the event is stored as JSON or binary format.
 
 ## Handling concurrency
 
-When appending events to a stream, you can supply a *stream state*. Your client uses this to inform KurrentDB of the state or version you expect the stream to be in when appending an event. If the stream isn't in that state, an exception will be thrown. 
+When appending events to a stream, you can supply a *stream state*. Your client uses this to inform TrogonEventStore of the state or version you expect the stream to be in when appending an event. If the stream isn't in that state, an exception will be thrown.
 
 For example, if you try to append the same record twice, expecting both times that the stream doesn't exist, you will get an exception on the second:
 
@@ -154,14 +154,14 @@ client.appendToStream("no-stream-stream", options, eventDataTwo)
         .get();
 ```
 
-There are several available expected revision options: 
+There are several available expected revision options:
 - `StreamState.any()` - No concurrency check
 - `StreamState.noStream()` - Stream should not exist
 - `StreamState.streamExists()` - Stream should exist
 - `StreamState.streamRevision(long revision)` - Stream should be at specific revision
 
 This check can be used to implement optimistic concurrency. When retrieving a
-stream from KurrentDB, note the current version number. When you save it back,
+stream from TrogonEventStore, note the current version number. When you save it back,
 you can determine if somebody else has modified the record in the meantime.
 
 First, let's define the event classes for our ecommerce example:
@@ -255,25 +255,25 @@ client.appendToStream("some-stream", options, eventData)
 
 ## Atomic appends
 
-KurrentDB provides two operations for appending events to one or more streams in a single atomic transaction: `appendRecords` and `multiStreamAppend`. Both guarantee that either all writes succeed or the entire operation fails, but they differ in how records are organized, ordered, and validated.
+TrogonEventStore provides two operations for appending events to one or more streams in a single atomic transaction: `appendRecords` and `multiStreamAppend`. Both guarantee that either all writes succeed or the entire operation fails, but they differ in how records are organized, ordered, and validated.
 
 |                        | `appendRecords`                                                                                                 | `multiStreamAppend`                                                                             |
 |------------------------|-----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
-| **Available since**    | KurrentDB 26.1                                                                                                  | KurrentDB 25.1                                                                                  |
+| **Available since**    | TrogonEventStore 26.1                                                                                                  | TrogonEventStore 25.1                                                                                  |
 | **Record ordering**    | Interleaved. Records from different streams can be mixed, and their exact order is preserved in the global log. | Grouped. All records for a stream are sent together; ordering across streams is not guaranteed. |
 | **Consistency checks** | Decoupled. Can validate the state of any stream, including streams not being written to.                        | Coupled. Expected state is specified per stream being written to.                               |
 
 ::: warning
 Metadata must be a valid JSON object, using string keys and string values only.
 Binary metadata is not supported in this version to maintain compatibility with
-KurrentDB's metadata handling. This restriction will be lifted in the next major
+TrogonEventStore's metadata handling. This restriction will be lifted in the next major
 release.
 :::
 
 ### AppendRecords
 
 ::: note
-This feature is only available in KurrentDB 26.1 and later.
+This feature is only available in TrogonEventStore 26.1 and later.
 :::
 
 `appendRecords` appends events to one or more streams atomically. Each record specifies which stream it targets, and the exact order of records is preserved in the global log across all streams.
@@ -347,7 +347,7 @@ Because checks are decoupled from writes, you can validate the state of streams 
 ### MultiStreamAppend
 
 ::: note
-This feature is only available in KurrentDB 25.1 and later.
+This feature is only available in TrogonEventStore 25.1 and later.
 :::
 
 `multiStreamAppend` appends events to one or more streams atomically. Records are grouped per stream using `AppendStreamRequest`, where each request specifies a stream name, an expected state, and the events for that stream.

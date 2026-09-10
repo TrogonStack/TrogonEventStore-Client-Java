@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "06ed98a163cbef376b50d0cd195716b8d7e58135",
+  "signoff": "SHT Bot <61149376+sht-bot@users.noreply.github.com>",
+  "packages": {
+    ".": {
+      "release-type": "java",
+      "package-name": "trogon-eventstore-client",
+      "component": "trogon-eventstore-client",
+      "include-component-in-tag": false,
+      "include-v-in-tag": true,
+      "skip-snapshot": true,
+      "pull-request-title-pattern": "chore${scope}: release ${version}",
+      "extra-files": [
+        {
+          "type": "generic",
+          "path": "build.gradle"
+        }
+      ],
+      "bump-minor-pre-major": false,
+      "bump-patch-for-minor-pre-major": false
+    }
+  }
+}

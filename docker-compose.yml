@@ -23,15 +23,15 @@ services:
     depends_on:
       - volumes-provisioner
 
-  esdb-node1: &template
-    image: ${KURRENTDB_DOCKER_REGISTRY:-kurrentplatform}/${KURRENTDB_DOCKER_IMAGE:-kurrentdb}:${KURRENTDB_DOCKER_TAG:-lts}
+  trogon-eventstore-node1: &template
+    image: ${TROGON_EVENTSTORE_IMAGE:-ghcr.io/trogonstack/trogoneventstore:ci}
     env_file:
       - vars.env
     environment:
       - EVENTSTORE_GOSSIP_SEED=172.30.240.12:2113,172.30.240.13:2113
       - EVENTSTORE_REPLICATION_IP=172.30.240.11
-      - EVENTSTORE_CERTIFICATE_FILE=/etc/kurrentdb/certs/node1/node.crt
-      - EVENTSTORE_CERTIFICATE_PRIVATE_KEY_FILE=/etc/kurrentdb/certs/node1/node.key
+      - EVENTSTORE_CERTIFICATE_FILE=/etc/trogon-eventstore/certs/node1/node.crt
+      - EVENTSTORE_CERTIFICATE_PRIVATE_KEY_FILE=/etc/trogon-eventstore/certs/node1/node.key
       - EVENTSTORE_ADVERTISE_NODE_PORT_TO_CLIENT_AS=2111
     ports:
       - 2111:2113
@@ -39,18 +39,18 @@ services:
       clusternetwork:
         ipv4_address: 172.30.240.11
     volumes:
-      - ./certs:/etc/kurrentdb/certs
+      - ./certs:/etc/trogon-eventstore/certs
     restart: unless-stopped
     depends_on:
       - cert-gen
 
-  esdb-node2:
+  trogon-eventstore-node2:
     <<: *template
     environment:
       - EVENTSTORE_GOSSIP_SEED=172.30.240.11:2113,172.30.240.13:2113
       - EVENTSTORE_REPLICATION_IP=172.30.240.12
-      - EVENTSTORE_CERTIFICATE_FILE=/etc/kurrentdb/certs/node2/node.crt
-      - EVENTSTORE_CERTIFICATE_PRIVATE_KEY_FILE=/etc/kurrentdb/certs/node2/node.key
+      - EVENTSTORE_CERTIFICATE_FILE=/etc/trogon-eventstore/certs/node2/node.crt
+      - EVENTSTORE_CERTIFICATE_PRIVATE_KEY_FILE=/etc/trogon-eventstore/certs/node2/node.key
       - EVENTSTORE_ADVERTISE_NODE_PORT_TO_CLIENT_AS=2112
     ports:
       - 2112:2113
@@ -58,13 +58,13 @@ services:
       clusternetwork:
         ipv4_address: 172.30.240.12
 
-  esdb-node3:
+  trogon-eventstore-node3:
     <<: *template
     environment:
       - EVENTSTORE_GOSSIP_SEED=172.30.240.11:2113,172.30.240.12:2113
       - EVENTSTORE_REPLICATION_IP=172.30.240.13
-      - EVENTSTORE_CERTIFICATE_FILE=/etc/kurrentdb/certs/node3/node.crt
-      - EVENTSTORE_CERTIFICATE_PRIVATE_KEY_FILE=/etc/kurrentdb/certs/node3/node.key
+      - EVENTSTORE_CERTIFICATE_FILE=/etc/trogon-eventstore/certs/node3/node.crt
+      - EVENTSTORE_CERTIFICATE_PRIVATE_KEY_FILE=/etc/trogon-eventstore/certs/node3/node.key
       - EVENTSTORE_ADVERTISE_NODE_PORT_TO_CLIENT_AS=2113
     ports:
       - 2113:2113
@@ -74,7 +74,7 @@ services:
 
 networks:
   clusternetwork:
-    name: kurrentdb.local
+    name: trogon-eventstore.local
     driver: bridge
     ipam:
       driver: default
