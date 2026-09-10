@@ -3,21 +3,21 @@ order: 3
 head:
   - - title
     - {}
-    - Reading Events | Java | Clients | Kurrent Docs
+    - Reading Events | Java | Clients | TrogonEventStore docs
 ---
 
 # Reading Events
 
-KurrentDB provides two primary methods for reading events: reading from an
+TrogonEventStore provides two primary methods for reading events: reading from an
 individual stream to retrieve events from a specific named stream, or reading
 from the `$all` stream to access all events across the entire event store.
 
-Events in KurrentDB are organized within individual streams and use two
+Events in TrogonEventStore are organized within individual streams and use two
 distinct positioning systems to track their location. The **revision number** is
 a 64-bit signed integer (`long`) that represents the sequential position of an
 event within its specific stream. Events are numbered starting from 0, with each
 new event receiving the next sequential revision number (0, 1, 2, 3...). The
-**global position** represents the event's location in KurrentDB's global
+**global position** represents the event's location in TrogonEventStore's global
 transaction log and consists of two coordinates: the `commit` position (where
 the transaction was committed in the log) and the `prepare` position (where the
 transaction was initially prepared).
@@ -92,7 +92,7 @@ ReadStreamOptions options = ReadStreamOptions.get()
 
 #### resolveLinkTos
 
-When using projections to create new events you can set whether the generated events are pointers to existing events. Setting this value to true will tell KurrentDB to return the event as well as the event linking to it.
+When using projections to create new events you can set whether the generated events are pointers to existing events. Setting this value to true will tell TrogonEventStore to return the event as well as the event linking to it.
 
 ```java{4}
 ReadStreamOptions options = ReadStreamOptions.get()
@@ -146,7 +146,7 @@ Read one event backwards to find the last position in the stream.
 
 Reading a stream returns a `ReadStreamResult`, which contains a property `ReadState`. This property can have the value `StreamNotFound` or `Ok`.
 
-It is important to check the value of this field before attempting to iterate an empty stream, as it will throw an exception. 
+It is important to check the value of this field before attempting to iterate an empty stream, as it will throw an exception.
 
 For example:
 
@@ -180,7 +180,7 @@ direction and the transaction log position from which you want to start. The
 transaction log position can be specified in several ways:
 
 - Use `fromStart()` to begin from the very beginning of the transaction log
-- Use `fromEnd()` to begin from the current end of the transaction log  
+- Use `fromEnd()` to begin from the current end of the transaction log
 - Use `fromPosition(Position position)` with a specific `Position` object containing commit and prepare coordinates
 
 ```java{2-3}
@@ -233,7 +233,7 @@ ReadAllOptions options = ReadAllOptions.get()
 
 #### resolveLinkTos
 
-When using projections to create new events you can set whether the generated events are pointers to existing events. Setting this value to true will tell KurrentDB to return the event as well as the event linking to it.
+When using projections to create new events you can set whether the generated events are pointers to existing events. Setting this value to true will tell TrogonEventStore to return the event as well as the event linking to it.
 
 ```java{4}
 ReadAllOptions options = ReadAllOptions.get()
@@ -278,7 +278,7 @@ Read one event backwards to find the last position in the `$all` stream.
 
 ### Handling system events
 
-KurrentDB will also return system events when reading from the `$all` stream. In most cases you can ignore these events.
+TrogonEventStore will also return system events when reading from the `$all` stream. In most cases you can ignore these events.
 
 All system events begin with `$` or `$$` and can be easily ignored by checking the `eventType` property.
 
@@ -298,7 +298,7 @@ for (ResolvedEvent resolvedEvent : result.getEvents()) {
 }
 ```
 
-## Java Reactive Streams 
+## Java Reactive Streams
 
 The Java Reactive Streams API allows you to read events in a non-blocking manner, which is particularly useful for applications that require high throughput and low latency. The reactive API provides a way to subscribe to streams of events and process them as they arrive.
 

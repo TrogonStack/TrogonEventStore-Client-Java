@@ -1,72 +1,56 @@
-<a href="https://kurrent.io">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="KurrentLogo-White.png">
-    <source media="(prefers-color-scheme: light)" srcset="KurrentLogo-Black.png">
-    <img alt="Kurrent" src="KurrentLogo-Plum.png" height="50%" width="50%">
-  </picture>
-</a>
+# TrogonEventStore Java Client
 
-# KurrentDB Java Client
+[![CI](https://github.com/TrogonStack/TrogonEventStore-Client-Java/actions/workflows/ci.yml/badge.svg)](https://github.com/TrogonStack/TrogonEventStore-Client-Java/actions/workflows/ci.yml)
 
-[![CI](https://github.com/kurrent-io/KurrentDB-Client-Java/actions/workflows/ci.yml/badge.svg)](https://github.com/kurrent-io/KurrentDB-Client-Java/actions/workflows/ci.yml)
-[![LTS](https://github.com/kurrent-io/KurrentDB-Client-Java/actions/workflows/lts.yml/badge.svg)](https://github.com/kurrent-io/KurrentDB-Client-Java/actions/workflows/lts.yml)
-[![Previous LTS](https://github.com/kurrent-io/KurrentDB-Client-Java/actions/workflows/previous-lts.yml/badge.svg)](https://github.com/kurrent-io/KurrentDB-Client-Java/actions/workflows/previous-lts.yml)
+The Java client for [TrogonEventStore](https://github.com/TrogonStack/TrogonEventStore), compatible with Java 8 and newer.
 
-KurrentDB is a database that's engineered for modern software applications and event-driven architectures. Its
-event-native design simplifies data modeling and preserves data integrity while the integrated streaming engine solves
-distributed messaging challenges and ensures data consistency.
+## Install
 
-This repository contains an [KurrentDB](https://kurrent.io) Client SDK written in Java for use with languages on the
-JVM. It is compatible with Java 8 and above.
+Packages are published to GitHub Packages under `io.trogonstack:trogon-eventstore-client`.
 
-## Access to binaries
+```groovy
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/TrogonStack/TrogonEventStore-Client-Java")
+        credentials {
+            username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_ACTOR")
+            password = providers.gradleProperty("gpr.key").orNull ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
 
-Kurrent, Inc publishes GA (general availability) versions
-to [Maven Central](https://search.maven.org/artifact/io.kurrent/kurrentdb-client).
+dependencies {
+    implementation "io.trogonstack:trogon-eventstore-client:VERSION"
+}
+```
 
-## KurrentDB Server Compatibility
+GitHub Packages requires authentication. Use a classic personal access token with `read:packages` outside GitHub Actions. Do not commit credentials or a credential-bearing Gradle properties file.
 
-This client is compatible with version `20.6.1` upwards.
+## Connect
 
-Server setup instructions can be found in
-the [docs](https://developers.kurrent.io/server/v25.0/quick-start/installation), follow the docker setup for the
-simplest configuration.
+```java
+import io.trogonstack.eventstore.client.TrogonEventStoreClient;
+import io.trogonstack.eventstore.client.TrogonEventStoreClientSettings;
+import io.trogonstack.eventstore.client.TrogonEventStoreConnectionString;
 
-### Documentation
+TrogonEventStoreClientSettings settings = TrogonEventStoreConnectionString.parseOrThrow(
+    "trogon-eventstore://localhost:2113?tls=false"
+);
+TrogonEventStoreClient client = TrogonEventStoreClient.create(settings);
+```
 
-* [Samples](https://github.com/kurrent-io/KurrentDB-Client-Java/tree/trunk/src/test/java/io/kurrent/dbclient/samples)
+Use `trogon-eventstore+discover://` for DNS or gossip discovery.
 
-## Communities
+## Development
 
-[Join our global community](https://www.kurrent.io/community) of developers.
+The project uses the checked-in Gradle wrapper.
 
-- [Discuss](https://discuss.kurrent.io/)
-- [Discord (Kurrent)](https://discord.gg/Phn9pmCw3t)
-- [Discord (ddd-cqrs-es)](https://discord.com/invite/sEZGSHNNbH)
+```shell
+./gradlew clean check
+```
 
-## Contributing
+Integration tests use `ghcr.io/trogonstack/trogoneventstore:ci` by default. Override it with `TROGON_EVENTSTORE_IMAGE`.
 
-Development is done on the `main` branch.
-We attempt to do our best to ensure that the history remains clean and to do so, we generally ask contributors to squash
-their commits into a set or single logical commit.
+## License
 
-- [Create an issue](https://github.com/kurrent-io/KurrentDB-Client-Java/issues)
-- [Documentation](https://docs.kurrent.io/)
-- [Contributing guide](https://github.com/kurrent-io/KurrentDB-Client-Java/blob/main/CONTRIBUTING.md)
-
-### Running the tests
-
-The client is built using [`Gradle 8.13`](https://gradle.org). Integration tests run against a server using Docker.
-
-Tests are written using [TestContainers](https://www.testcontainers.org/) and require [Docker](https://www.docker.com/)
-to be installed.
-
-Specific docker images can be specified via the environment variable `KURRENTDB_IMAGE`.
-
-## More resources
-
-- [Release notes](https://kurrent.io/blog/release-notes)
-- [Beginners Guide to Event Sourcing](https://kurrent.io/event-sourcing)
-- [Articles](https://kurrent.io/blog)
-- [Webinars](https://kurrent.io/webinars)
-- [Contact us](https://kurrent.io/contact)
+Licensed under Apache-2.0. See [LICENSE](LICENSE).

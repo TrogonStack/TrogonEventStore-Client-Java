@@ -3,7 +3,7 @@ order: 4
 head:
   - - title
     - {}
-    - Catch-up Subscriptions | Java | Clients | Kurrent Docs
+    - Catch-up Subscriptions | Java | Clients | TrogonEventStore docs
 ---
 
 # Catch-up Subscriptions
@@ -102,7 +102,7 @@ client.subscribeToAll(
 
 ## Resolving link-to events
 
-Link-to events point to events in other streams in KurrentDB. These are
+Link-to events point to events in other streams in TrogonEventStore. These are
 generally created by projections such as the `$by_event_type` projection which
 links events of the same event type into the same stream. This makes it easier
 to look up all events of a specific type.
@@ -205,8 +205,8 @@ client.subscribeToAll(
 
 ## Handling Subscription State Changes
 
-::: info KurrentDB 23.10.0+
-This feature requires KurrentDB version 23.10.0 or later.
+::: info TrogonEventStore 23.10.0+
+This feature requires TrogonEventStore version 23.10.0 or later.
 :::
 
 When a subscription processes historical events and reaches the end of the
@@ -265,7 +265,7 @@ client.subscribeToAll(listener, options);
 
 ## Server-side Filtering
 
-KurrentDB allows you to filter events while subscribing to the `$all` stream to only receive the events you care about. You can filter by event type or stream name using a regular expression or a prefix. Server-side filtering is currently only available on the `$all` stream.
+TrogonEventStore allows you to filter events while subscribing to the `$all` stream to only receive the events you care about. You can filter by event type or stream name using a regular expression or a prefix. Server-side filtering is currently only available on the `$all` stream.
 
 ::: tip
 Server-side filtering was introduced as a simpler alternative to projections. You should consider filtering before creating a projection to include the events you care about.
@@ -348,7 +348,7 @@ A checkpoint is the position of an event in the `$all` stream to which your appl
 To create a checkpoint, store the event's commit or prepare position.
 
 ::: warning
-If your database contains events created by the legacy TCP client using the [transaction feature](https://docs.kurrent.io/clients/tcp/dotnet/21.2/appending.html#transactions), you should store both the commit and prepare positions together as your checkpoint.
+If your database contains events created by the legacy TCP client using the [transaction feature](https://github.com/TrogonStack/TrogonEventStore), you should store both the commit and prepare positions together as your checkpoint.
 :::
 
 ### Updating checkpoints at regular intervals
@@ -376,7 +376,7 @@ By default, the checkpoint notification is sent after every 32 non-system events
 
 ### Configuring the checkpoint interval
 
-You can adjust the checkpoint interval to change how often the client is notified. 
+You can adjust the checkpoint interval to change how often the client is notified.
 
 ```java
 String excludeSystemEventsRegex = "/^[^\\$].*/";

@@ -1,0 +1,15 @@
+package io.trogonstack.eventstore.client;
+
+import java.util.List;
+
+class ListProjectionsResult {
+    private final List<ProjectionDetails> projections;
+
+    public ListProjectionsResult(List<ProjectionDetails> projections) {
+        this.projections = projections;
+    }
+
+    public List<ProjectionDetails> getProjections() {
+        return this.projections;
+    }
+}

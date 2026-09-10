@@ -3,7 +3,7 @@ order: 8
 head:
   - - title
     - {}
-    - Observability | Java | Clients | Kurrent Docs
+    - Observability | Java | Clients | TrogonEventStore docs
 ---
 
 # Observability
@@ -27,21 +27,21 @@ Maven `pom.xml` or Gradle `build.gradle`:
         <artifactId>opentelemetry-sdk</artifactId>
         <version>1.40.0</version>
     </dependency>
-    
+
     <!-- For console/logging output -->
     <dependency>
         <groupId>io.opentelemetry</groupId>
         <artifactId>opentelemetry-exporter-logging</artifactId>
         <version>1.40.0</version>
     </dependency>
-    
+
     <!-- For OTLP (OpenTelemetry Protocol) -->
     <dependency>
         <groupId>io.opentelemetry</groupId>
         <artifactId>opentelemetry-exporter-otlp</artifactId>
         <version>1.40.0</version>
     </dependency>
-    
+
     <!-- Semantic conventions -->
     <dependency>
         <groupId>io.opentelemetry.semconv</groupId>
@@ -97,10 +97,10 @@ public class EventStoreObservability {
                 .setTracerProvider(sdkTracerProvider)
                 .buildAndRegisterGlobal();
 
-        // Your KurrentDB client operations will now be traced
-        KurrentDBClientSettings settings = KurrentDBConnectionString
-                .parseOrThrow("kurrentdb://localhost:2113?tls=false");
-        KurrentDBClient client = KurrentDBClient.create(settings);
+        // Your TrogonEventStore client operations will now be traced
+        TrogonEventStoreClientSettings settings = TrogonEventStoreConnectionString
+                .parseOrThrow("trogon-eventstore://localhost:2113?tls=false");
+        TrogonEventStoreClient client = TrogonEventStoreClient.create(settings);
     }
 }
 ```
@@ -169,14 +169,14 @@ Each trace includes metadata to help with debugging and monitoring:
 | Attribute                         | Description                            | Example                               |
 | --------------------------------- | -------------------------------------- | ------------------------------------- |
 | `db.user`                         | Database user name                     | `admin`                               |
-| `db.system`                       | Database system identifier             | `eventstoredb`                        |
+| `db.system`                       | Database system identifier             | `trogon_eventstore`                   |
 | `db.operation`                    | Type of operation performed            | `streams.append`, `streams.subscribe` |
-| `db.eventstoredb.stream`          | Stream name or identifier              | `user-events-123`                     |
-| `db.eventstoredb.subscription.id` | Subscription identifier                | `user-events-123-sub`                 |
-| `db.eventstoredb.event.id`        | Event identifier                       | `event-456`                           |
-| `db.eventstoredb.event.type`      | Event type identifier                  | `user.created`                        |
-| `server.address`                  | KurrentDB server address            | `localhost`                           |
-| `server.port`                     | KurrentDB server port               | `2113`                                |
+| `db.trogon_eventstore.stream`          | Stream name or identifier              | `user-events-123`                     |
+| `db.trogon_eventstore.subscription.id` | Subscription identifier                | `user-events-123-sub`                 |
+| `db.trogon_eventstore.event.id`        | Event identifier                       | `event-456`                           |
+| `db.trogon_eventstore.event.type`      | Event type identifier                  | `user.created`                        |
+| `server.address`                  | TrogonEventStore server address            | `localhost`                           |
+| `server.port`                     | TrogonEventStore server port               | `2113`                                |
 | `exception.type`                  | Exception type if an error occurred    |                                       |
 | `exception.message`               | Exception message if an error occurred |                                       |
 | `exception.stacktrace`            | Stack trace of the exception           |                                       |

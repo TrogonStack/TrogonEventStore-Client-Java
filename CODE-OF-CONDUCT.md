@@ -1,6 +1,6 @@
 # Contributor Covenant Code of Conduct
 
-`KurrentDB-Client-Java` follows the widely-adopted Contributor Covenant Code of Conduct.
+`TrogonEventStore-Client-Java` follows the widely adopted Contributor Covenant Code of Conduct.
 
 ## Our Pledge
 
@@ -62,7 +62,7 @@ representative at an online or offline event.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement at
-[`abuse@eventstore.com`](mailto:abuse@eventstore.com).
+through the repository maintainers on GitHub.
 
 All complaints will be reviewed and investigated promptly and fairly.
 

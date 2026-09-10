@@ -3,7 +3,7 @@ order: 5
 head:
   - - title
     - {}
-    - Persistent Subscriptions | Java | Clients | Kurrent Docs
+    - Persistent Subscriptions | Java | Clients | TrogonEventStore docs
 ---
 
 # Persistent Subscriptions
@@ -29,7 +29,7 @@ You can read more about persistent subscriptions in the [server documentation](@
 The Java client provides a `PersistentSubscriptionsClient` that you can use to manage persistent subscriptions.
 
 ```java
-KurrentDBClientSettings settings = KurrentDBConnectionString.parseOrThrow("kurrentdb://localhost:2113?tls=false");
+TrogonEventStoreClientSettings settings = TrogonEventStoreConnectionString.parseOrThrow("trogon-eventstore://localhost:2113?tls=false");
 PersistentSubscriptionsClient client = PersistentSubscriptionsClient.create(settings);
 ```
 
@@ -65,7 +65,7 @@ client.createToAll(
 ```
 
 ::: note
-As from EventStoreDB 21.10, the ability to subscribe to `$all` supports
+Subscriptions to `$all` support
 [server-side filtering](subscriptions.md#server-side-filtering). You can create
 a subscription group for `$all` similarly to how you would for a specific
 stream:
@@ -212,7 +212,7 @@ resources.
 
 For use with an indexing projection such as the system `$by_category` projection.
 
-KurrentDB inspects the event for its source stream id, hashing the id to one
+TrogonEventStore inspects the event for its source stream id, hashing the id to one
 of 1024 buckets assigned to individual clients. When a client disconnects, its
 buckets are assigned to other clients. When a client connects, it is assigned
 some existing buckets. This naively attempts to maintain a balanced workload.

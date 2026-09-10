@@ -3,63 +3,63 @@ order: 1
 head:
   - - title
     - {}
-    - Getting Started | Java | Clients | KurrentDB Docs
+    - Getting Started | Java | Clients | TrogonEventStore Docs
 ---
 
 # Getting started
 
-This guide will help you get started with KurrentDB in your Java application.
-It covers the basic steps to connect to KurrentDB, create events, append them
+This guide will help you get started with TrogonEventStore in your Java application.
+It covers the basic steps to connect to TrogonEventStore, create events, append them
 to streams, and read them back.
 
 ## Required packages
 
-Add the `kurrentdb-client` dependency to your project:
+Add the `trogon-eventstore-client` dependency to your project:
 
 ::: tabs
 @tab gradle
 ```groovy
-implementation 'io.kurrent:kurrentdb-client:1.1.x'
+implementation 'io.trogonstack:trogon-eventstore-client:1.1.x'
 ```
 @tab maven
 ```xml
 <dependency>
-    <groupId>io.kurrent</groupId>
-    <artifactId>kurrentdb-client</artifactId>
+    <groupId>io.trogonstack</groupId>
+    <artifactId>trogon-eventstore-client</artifactId>
     <version>1.1.x</version>
 </dependency>
 ```
 :::
 
-## Connecting to KurrentDB
+## Connecting to TrogonEventStore
 
-To connect your application to KurrentDB, you need to configure and create a client instance.
+To connect your application to TrogonEventStore, you need to configure and create a client instance.
 
 ::: tip Insecure clusters
-The recommended way to connect to KurrentDB is using secure mode (which is
-the default). However, if your KurrentDB instance is running in insecure
+The recommended way to connect to TrogonEventStore is using secure mode (which is
+the default). However, if your TrogonEventStore instance is running in insecure
 mode, you must explicitly set `tls=false` in your connection
 string or client configuration.
 :::
 
-KurrentDB uses connection strings to configure the client connection. The connection string supports two protocols:
+TrogonEventStore uses connection strings to configure the client connection. The connection string supports two protocols:
 
-- **`kurrentdb://`** - for connecting directly to specific node endpoints (single node or multi-node cluster with explicit endpoints)
-- **`kurrentdb+discover://`** - for connecting using cluster discovery via DNS or gossip endpoints
+- **`trogon-eventstore://`** - for connecting directly to specific node endpoints (single node or multi-node cluster with explicit endpoints)
+- **`trogon-eventstore+discover://`** - for connecting using cluster discovery via DNS or gossip endpoints
 
-When using `kurrentdb://`, you specify the exact endpoints to connect to. The client will connect directly to these endpoints. For multi-node clusters, you can specify multiple endpoints separated by commas, and the client will query each node's Gossip API to get cluster information, then picks a node based on the URI's node preference.
+When using `trogon-eventstore://`, you specify the exact endpoints to connect to. The client will connect directly to these endpoints. For multi-node clusters, you can specify multiple endpoints separated by commas, and the client will query each node's Gossip API to get cluster information, then picks a node based on the URI's node preference.
 
-With `kurrentdb+discover://`, the client uses cluster discovery to find available nodes. This is particularly useful when you have a DNS A record pointing to cluster nodes or when you want the client to automatically discover the cluster topology.
+With `trogon-eventstore+discover://`, the client uses cluster discovery to find available nodes. This is particularly useful when you have a DNS A record pointing to cluster nodes or when you want the client to automatically discover the cluster topology.
 
 ::: info Gossip support
-Since version 22.10, KurrentDB supports gossip on single-node deployments, so
-`kurrentdb+discover://` can be used for any topology, including single-node setups.
+Since version 22.10, TrogonEventStore supports gossip on single-node deployments, so
+`trogon-eventstore+discover://` can be used for any topology, including single-node setups.
 :::
 
 For cluster connections using discovery, use the following format:
 
 ```
-kurrentdb+discover://admin:changeit@cluster.dns.name:2113
+trogon-eventstore+discover://admin:changeit@cluster.dns.name:2113
 ```
 
 Where `cluster.dns.name` is a DNS `A` record that points to all cluster nodes.
@@ -67,13 +67,13 @@ Where `cluster.dns.name` is a DNS `A` record that points to all cluster nodes.
 For direct connections to specific endpoints, you can specify individual nodes:
 
 ```
-kurrentdb://admin:changeit@node1.dns.name:2113,node2.dns.name:2113,node3.dns.name:2113
+trogon-eventstore://admin:changeit@node1.dns.name:2113,node2.dns.name:2113,node3.dns.name:2113
 ```
 
 Or for a single node:
 
 ```
-kurrentdb://admin:changeit@localhost:2113
+trogon-eventstore://admin:changeit@localhost:2113
 ```
 
 There are a number of query parameters that can be used in the connection string to instruct the cluster how and where the connection should be established. All query parameters are optional.
@@ -95,31 +95,31 @@ There are a number of query parameters that can be used in the connection string
 | `userKeyFile`         | String, file path                                 | None     | Key file for the user certificate used for X.509 authentication.                                                                               |
 | `feature`             | `dns-lookup`                                      | None     | Enable specific client features. Use `dns-lookup` with `dnsDiscover=true` to resolve hostnames to multiple IP addresses for cluster discovery. |
 
-When connecting to an insecure instance, specify `tls=false` parameter. For example, for a node running locally use `kurrentdb://localhost:2113?tls=false`. Note that usernames and passwords aren't provided there because insecure deployments don't support authentication and authorisation.
+When connecting to an insecure instance, specify `tls=false` parameter. For example, for a node running locally use `trogon-eventstore://localhost:2113?tls=false`. Note that usernames and passwords aren't provided there because insecure deployments don't support authentication and authorisation.
 
 ## Creating a client
 
 First, create a client and get it connected to the database.
 
 ```java
-import io.kurrent.dbclient.KurrentDBClient;
-import io.kurrent.dbclient.KurrentDBClientSettings;
-import io.kurrent.dbclient.KurrentDBConnectionString;
+import io.trogonstack.eventstore.client.TrogonEventStoreClient;
+import io.trogonstack.eventstore.client.TrogonEventStoreClientSettings;
+import io.trogonstack.eventstore.client.TrogonEventStoreConnectionString;
 
-KurrentDBClientSettings settings = KurrentDBConnectionString.parseOrThrow("kurrentdb://localhost:2113?tls=false");
-KurrentDBClient client = KurrentDBClient.create(settings);
+TrogonEventStoreClientSettings settings = TrogonEventStoreConnectionString.parseOrThrow("trogon-eventstore://localhost:2113?tls=false");
+TrogonEventStoreClient client = TrogonEventStoreClient.create(settings);
 ```
 
 The client instance can be used as a singleton across the whole application. It doesn't need to open or close the connection.
 
 ## Creating an event
 
-You can write anything to KurrentDB as events. The client needs a byte array as the event payload. Normally, you'd use a serialized object, and it's up to you to choose the serialization method.
+You can write anything to TrogonEventStore as events. The client needs a byte array as the event payload. Normally, you'd use a serialized object, and it's up to you to choose the serialization method.
 
 The code snippet below creates an event object instance, serializes it, and adds it as a payload to the `EventData` structure, which the client can then write to the database.
 
 ```java
-import io.kurrent.dbclient.EventData;
+import io.trogonstack.eventstore.client.EventData;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 public class OrderPlaced {
